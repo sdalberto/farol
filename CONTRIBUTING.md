@@ -5,7 +5,7 @@ Obrigado pelo interesse! 🎉 Todo o código é comentado em português para fac
 ## Preparando o ambiente
 
 ```bash
-git clone https://github.com/SEU_USUARIO/farol.git && cd farol
+git clone https://github.com/sdalberto/farol.git && cd farol
 python -m venv .venv && . .venv/bin/activate    # Windows: .venv\Scripts\activate
 pip install -r requirements-dev.txt
 python -m farol --home ./.dados-dev setup        # pasta de dados separada para testes
