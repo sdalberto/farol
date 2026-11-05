@@ -1,0 +1,197 @@
+<!doctype html>
+<!--
+  Farol — interface principal.
+  Página única (SPA) sem nenhuma dependência externa: funciona 100% offline.
+  O conteúdo dinâmico é montado por app.js; textos traduzidos via data-i18n.
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Farol</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/vendor/xterm.css">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body class="booting">
+  <!-- Fundo personalizável (gradiente, cor sólida ou imagem) -->
+  <div id="bg" aria-hidden="true"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+  <div id="bg-shade" aria-hidden="true"></div>
+
+  <!-- ============ LOGIN ============ -->
+  <section id="login" class="view hidden" aria-labelledby="login-title">
+    <form id="login-form" class="glass card login-card" autocomplete="off">
+      <div class="logo big" id="login-logo">Farol</div>
+      <p class="muted" data-i18n="login.subtitle">Seu buscador offline e privado</p>
+      <label class="sr" for="login-pass" data-i18n="login.password">Senha</label>
+      <input id="login-pass" type="password" class="input" data-i18n-ph="login.password" autofocus required>
+      <button class="btn primary wide" type="submit" data-i18n="login.enter">Entrar</button>
+      <p id="login-error" class="error" role="alert"></p>
+      <select id="login-lang" class="input small" aria-label="Idioma">
+        <option value="pt-BR">Português</option><option value="en">English</option><option value="es">Español</option>
+      </select>
+    </form>
+  </section>
+
+  <!-- ============ APLICAÇÃO ============ -->
+  <section id="app" class="view hidden">
+    <!-- Barra superior (aparece nos resultados / navegação) -->
+    <header id="topbar" class="hidden">
+      <button class="logo small link" id="top-logo" data-go="home">Farol</button>
+      <form class="searchbox compact" data-search>
+        <span class="sb-icon" data-icon="search"></span>
+        <input type="search" name="q" autocomplete="off" data-i18n-ph="search.placeholder">
+        <button type="button" class="icon-btn ai-mini" data-act="ai" data-i18n-title="ai.title"><span data-icon="spark"></span></button>
+      </form>
+      <nav class="top-actions" data-actions></nav>
+    </header>
+
+    <!-- Ações do canto (na home) -->
+    <nav id="corner" class="top-actions" data-actions></nav>
+
+    <!-- HOME estilo buscador -->
+    <main id="home" class="page">
+      <div class="clock" id="clock"></div>
+      <div class="greeting muted" id="greeting"></div>
+      <h1 class="logo hero" id="hero-logo">Farol</h1>
+      <form class="searchbox big glass" data-search role="search">
+        <span class="sb-icon" data-icon="search"></span>
+        <input type="search" name="q" autocomplete="off" data-i18n-ph="search.placeholder" aria-label="Buscar">
+        <button type="button" class="icon-btn" data-act="ai" data-i18n-title="ai.title"><span data-icon="spark"></span></button>
+      </form>
+      <div class="chips" id="home-chips"></div>
+      <p class="hint muted" data-i18n="search.hint">Dica: "frase exata", -excluir, ext:pdf, tipo:video — pressione / para buscar</p>
+
+      <section class="tiles-section">
+        <h2 data-i18n="home.favorites">Favoritos</h2>
+        <div class="tiles" id="fav-tiles"></div>
+      </section>
+      <section class="tiles-section">
+        <h2 data-i18n="home.folders">Pastas</h2>
+        <div class="tiles" id="folder-tiles"></div>
+      </section>
+      <section class="tiles-section">
+        <h2 data-i18n="home.recent">Abertos recentemente</h2>
+        <div class="recent-list" id="recent-list"></div>
+      </section>
+      <footer class="stats muted" id="home-stats"></footer>
+    </main>
+
+    <!-- RESULTADOS -->
+    <main id="results" class="page hidden">
+      <div class="tabs" id="kind-tabs" role="tablist"></div>
+      <div class="result-meta muted" id="result-meta"></div>
+      <div class="result-list" id="result-list"></div>
+      <button class="btn ghost hidden" id="more-btn" data-i18n="search.more">Mais resultados</button>
+    </main>
+
+    <!-- NAVEGAÇÃO DE PASTAS -->
+    <main id="browse" class="page hidden">
+      <div class="crumbs" id="crumbs"></div>
+      <div class="grid-files" id="browse-grid"></div>
+    </main>
+
+    <!-- REDE -->
+    <main id="network" class="page hidden">
+      <h2 data-i18n="net.title">Rede</h2>
+      <section class="glass card">
+        <div class="row space">
+          <h3 data-i18n="net.sessions">Quem está conectado ao Farol</h3>
+        </div>
+        <div id="net-sessions" class="table"></div>
+      </section>
+      <section class="glass card">
+        <div class="row space">
+          <h3 data-i18n="net.devices">Dispositivos na rede local</h3>
+          <button class="btn" id="net-scan" data-i18n="net.scan">Escanear rede</button>
+        </div>
+        <p class="muted small" id="net-meta" data-i18n="net.help">Lista os aparelhos ativos na sua rede (IP, MAC e nome). Só redes privadas são escaneadas.</p>
+        <div id="net-devices" class="table"></div>
+      </section>
+    </main>
+
+    <!-- MODO DEV -->
+    <main id="dev" class="page hidden">
+      <div class="row space">
+        <h2 data-i18n="dev.title">Modo Dev</h2>
+        <div class="row">
+          <select id="dev-target" class="input small" aria-label="Destino"></select>
+          <button class="btn primary" id="dev-connect" data-i18n="dev.connect">Conectar</button>
+          <button class="btn" id="dev-disconnect" data-i18n="dev.disconnect">Desconectar</button>
+        </div>
+      </div>
+      <div id="term-wrap" class="glass"><div id="term"></div></div>
+      <section class="glass card">
+        <h3 data-i18n="dev.ssh_hosts">Conexões SSH salvas</h3>
+        <p class="muted small" data-i18n="dev.ssh_help">O Farol usa o cliente ssh do seu sistema: senhas são digitadas no terminal e nunca ficam salvas. Prefira chaves SSH.</p>
+        <div id="ssh-list" class="table"></div>
+        <form id="ssh-form" class="row wrap">
+          <input name="name" class="input small" data-i18n-ph="dev.name">
+          <input name="host" class="input small" data-i18n-ph="dev.host" required>
+          <input name="port" class="input tiny" type="number" value="22" min="1" max="65535">
+          <input name="user" class="input small" data-i18n-ph="dev.user">
+          <input name="key_path" class="input small" data-i18n-ph="dev.key">
+          <button class="btn" data-i18n="common.add">Adicionar</button>
+        </form>
+      </section>
+    </main>
+  </section>
+
+  <!-- ============ VISUALIZADOR ============ -->
+  <div id="viewer" class="overlay hidden" role="dialog" aria-modal="true">
+    <div class="viewer glass">
+      <header class="viewer-head">
+        <span class="vh-icon" id="v-icon"></span>
+        <div class="vh-title"><strong id="v-name"></strong><small class="muted" id="v-path"></small></div>
+        <div class="vh-actions" id="v-actions"></div>
+      </header>
+      <div class="viewer-body" id="v-body"></div>
+    </div>
+  </div>
+
+  <!-- ============ PAINEL DA IA ============ -->
+  <aside id="ai-panel" class="drawer glass hidden" aria-label="IA">
+    <header class="row space">
+      <h3><span data-icon="spark"></span> <span data-i18n="ai.title">Assistente</span></h3>
+      <button class="icon-btn" data-close="ai-panel"><span data-icon="close"></span></button>
+    </header>
+    <div class="ai-msgs" id="ai-msgs"></div>
+    <form id="ai-form" class="ai-form">
+      <textarea id="ai-input" rows="2" data-i18n-ph="ai.placeholder"></textarea>
+      <button class="btn primary" data-i18n="ai.send">Enviar</button>
+    </form>
+  </aside>
+
+  <!-- ============ CONFIGURAÇÕES ============ -->
+  <div id="settings" class="overlay hidden" role="dialog" aria-modal="true">
+    <div class="settings glass">
+      <header class="row space">
+        <h2 data-i18n="settings.title">Configurações</h2>
+        <button class="icon-btn" data-close="settings"><span data-icon="close"></span></button>
+      </header>
+      <div class="settings-wrap">
+        <nav class="settings-nav" id="settings-nav"></nav>
+        <div class="settings-body" id="settings-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PLAYER DE MÚSICA (fixo no rodapé) ============ -->
+  <div id="player" class="player glass hidden">
+    <button class="icon-btn" id="pl-prev"><span data-icon="prev"></span></button>
+    <button class="icon-btn play" id="pl-play"><span data-icon="play"></span></button>
+    <button class="icon-btn" id="pl-next"><span data-icon="next"></span></button>
+    <div class="pl-info"><strong id="pl-title"></strong><input type="range" id="pl-seek" min="0" max="1000" value="0"><small id="pl-time" class="muted"></small></div>
+    <input type="range" id="pl-vol" min="0" max="100" value="80" aria-label="Volume">
+    <button class="icon-btn" id="pl-close"><span data-icon="close"></span></button>
+    <audio id="pl-audio" preload="metadata"></audio>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script src="/static/vendor/xterm.js" defer></script>
+  <script src="/static/vendor/addon-fit.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>

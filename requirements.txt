@@ -1,0 +1,6 @@
+# Dependências do Farol (mínimas, de propósito).
+fastapi>=0.110
+uvicorn>=0.29
+websockets>=12        # terminal do Modo Dev (WebSocket)
+pypdf>=4.0            # leitura de PDF (opcional: sem ela o PDF é achado só pelo nome)
+pywinpty>=2.0; sys_platform == "win32"   # terminal completo no Windows (Modo Dev)

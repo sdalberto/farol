@@ -1,0 +1,34 @@
+# Serviço systemd do Farol (instalado por: sudo ./install.sh --server)
+# Endurecido: roda como usuário sem privilégios, com sistema de arquivos protegido.
+[Unit]
+Description=Farol - buscador offline
+After=network-online.target remote-fs.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=farol
+Group=farol
+Environment=FAROL_HOME=/var/lib/farol
+# Descomente para bloquear o Modo Dev (terminal) neste servidor:
+#Environment=FAROL_DISABLE_DEV=1
+ExecStart=/opt/farol/.venv/bin/python -m farol run --no-browser --port __PORT__
+WorkingDirectory=/opt/farol
+Restart=on-failure
+RestartSec=3
+
+# --- Endurecimento ---
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/farol
+# Para permitir EDITAR arquivos numa pasta indexada, adicione-a aqui, ex.:
+#ReadWritePaths=/var/lib/farol /srv/arquivos
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target

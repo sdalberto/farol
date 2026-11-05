@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "farol"
+version = "1.0.0"
+description = "Buscador offline, privado e open source para os seus arquivos"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+dependencies = [
+  "fastapi>=0.110",
+  "uvicorn>=0.29",
+  "websockets>=12",
+  "pypdf>=4.0",
+  "pywinpty>=2.0; sys_platform == 'win32'",
+]
+keywords = ["search", "offline", "desktop-search", "self-hosted", "privacy"]
+
+[project.scripts]
+farol = "farol.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["farol*"]
+
+[tool.setuptools.package-data]
+farol = ["static/*", "static/i18n/*", "static/vendor/*"]

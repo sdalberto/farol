@@ -1,0 +1,19 @@
+# Exemplo de uso:  FAROL_PASSWORD='suaSenhaForte' docker compose up -d
+services:
+  farol:
+    build: .
+    container_name: farol
+    restart: unless-stopped
+    ports:
+      - "8765:8765"
+    environment:
+      FAROL_PASSWORD: ${FAROL_PASSWORD:?defina FAROL_PASSWORD}
+      FAROL_LANG: pt-BR          # pt-BR | en | es
+      FAROL_DISABLE_DEV: "1"     # Modo Dev bloqueado no contêiner (remova para liberar)
+    volumes:
+      - farol-data:/data
+      # Monte aqui as pastas que quer pesquisar (":ro" = somente leitura):
+      - /srv/arquivos:/media/arquivos:ro
+      # - /mnt/nas/fotos:/media/fotos:ro
+volumes:
+  farol-data:
